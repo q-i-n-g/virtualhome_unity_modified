@@ -850,8 +850,8 @@
         "ModernHouseInteriorProps/Prefabs/Misc/mH_JournalBook.prefab"
     ],
     "juice": [
-        "Complete_Home_Interior_Pack/NEKOBOLT_Demo_Packs/Supermarket_Gluttony_Pack_DEMO/SMGP_Prefabs/SMGP_PRE_Juice_1024.prefab",
-        "Food/Liquid/Juice_2.prefab"
+        "Food/Liquid/Juice_2.prefab",
+        "Complete_Home_Interior_Pack/NEKOBOLT_Demo_Packs/Supermarket_Gluttony_Pack_DEMO/SMGP_Prefabs/SMGP_PRE_Juice_1024.prefab"
     ],
     "kettle": [
         "ModernHouseInteriorProps/Prefabs/Kitchen/mH_Kettle.prefab"

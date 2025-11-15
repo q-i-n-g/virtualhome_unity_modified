@@ -251,6 +251,16 @@ namespace StoryGenerator.Utilities
             Duration = duration;
         }
     }
+    public class ThumbsUpAction: IAction
+    {
+        public ScriptObjectName Name { get; private set; }
+        public int ScriptLine { get; private set; }
+
+        public ThumbsUpAction(int scriptLine, string name, int instance)
+        {
+            ScriptLine = scriptLine;
+        }
+    }
 
     public class SitAction : IAction
     {
@@ -1021,6 +1031,11 @@ namespace StoryGenerator.Utilities
         public void AddAction(OpenAction a)
         {
             script.Add(new ScriptPair() { Action = a, ProcessMethod = ((ac, s) => this.ProcessOpen((OpenAction)ac, s)) });
+        }
+
+        public void AddAction(ThumbsUpAction a)
+        {
+            script.Add(new ScriptPair() { Action = a, ProcessMethod = ((ac, s) => this.ProcessThumbsUp((ThumbsUpAction)ac, s)) });
         }
 
         #endregion
@@ -2339,6 +2354,14 @@ namespace StoryGenerator.Utilities
             }
         }
 
+        private IEnumerable<IStateGroup> ProcessThumbsUp(ThumbsUpAction a, State current)
+        {
+            State s = new State(current, a, current.InteractionPosition, ExecuteThumbsUp);
+
+            yield return s;
+        }
+
+
         private IEnumerable<IStateGroup> ProcessDrinkAction(DrinkAction a, State current)
         {
             GameObject go = current.GetScriptGameObject(a.Name);
@@ -2977,6 +3000,12 @@ namespace StoryGenerator.Utilities
                     if (cameraControls[cam_id] != null)
                         cameraControls[cam_id].ClearVisibleArea();
             }
+        }
+
+        private IEnumerator ExecuteThumbsUp(State s)
+        {
+            recorder.MarkActionStart(InteractionType.THUMBSUP, s.Action.ScriptLine);
+            yield return characterControl.ThumbsUp();
         }
 
         private IEnumerator ExecutePhoneAction(State s)
@@ -4193,6 +4222,9 @@ namespace StoryGenerator.Utilities
                     break;
                 case InteractionType.SPECIAL:
                     // Ignore
+                    break;
+                case InteractionType.THUMBSUP:
+                    sExecutor.AddAction(new ThumbsUpAction(sl.LineNumber, name0, instance0));
                     break;
                 default:
                     throw new ScriptReaderException(string.Format("Unsuported action: {0}, line: {1}", sl.Interaction.ToString(), sl.LineNumber));

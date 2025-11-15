@@ -41,6 +41,7 @@ sysinfo.txt
 # ====== #
 *.apk
 *.unitypackage
+*.unitypackage.meta
 
 # ============ #
 # OS generated #
@@ -66,6 +67,10 @@ Assets/Resources/ModernHouseInteriorProps/
 Assets/Resources/ModernHouseInteriorProps.meta
 Assets/Plugins/RootMotion/
 Assets/Plugins/RootMotion.meta
+Assets/Plugins/Complete Home Interior Pack [4.0].unitypackage.meta
+Assets/Plugins/DunGen 2.15.1.unitypackage.meta
+Assets/Plugins/Final IK 2.1.unitypackage.meta
+Assets/Plugins/Modern House Interior Props v1.0.unitypackage.meta
 Assets/RootMotion/
 Assets/RootMotion.meta
 Assets/Plugins/DunGen/
@@ -78,3 +83,5 @@ Assets/DunGen.meta
 # ============== #
 Output/
 Logs/
+
+mono_crash.mem.6708.1.blob

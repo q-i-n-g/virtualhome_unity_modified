@@ -307,6 +307,10 @@ namespace StoryGenerator.Utilities
 
                                 loadedObj = Resources.Load(ScriptUtils.TransformResourceFileName(prefab_path)) as GameObject;
                             }
+                            else
+                            {
+                                Debug.LogWarning($"[GraphExpander] Object {obj.class_name} (id:{obj.id}): prefab_name '{obj.prefab_name}' not found in AssetPathMap");
+                            }
                         }
                         if (loadedObj == null)
                         {
@@ -320,7 +324,15 @@ namespace StoryGenerator.Utilities
                                     {
                                         loadedObj = Resources.Load(ScriptUtils.TransformResourceFileName(fileNames[0])) as GameObject;
                                     }
+                                    else
+                                    {
+                                        Debug.LogWarning($"[GraphExpander] Object {obj.class_name} (id:{obj.id}): No obj_transform or bounding_box, skipping class_name lookup");
+                                    }
 
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"[GraphExpander] Object {obj.class_name} (id:{obj.id}): No assets found for class_name '{names[0]}'");
                                 }
                             }
 
@@ -563,10 +575,12 @@ namespace StoryGenerator.Utilities
                     EnvironmentObject sceneObj2;
 
                     if (alignment.TryGetValue(obj2.id, out sceneObj2)) {
+                        Debug.Log($"[GraphExpander.HandleCreateOn] Trying to place {obj.class_name} (id:{obj.id}) on {obj2.class_name} (id:{obj2.id})");
                         if (TryPlaceObject(obj, sceneObj2, false)) {
                             return true;
                         }
                     } else {
+                        Debug.LogWarning($"[GraphExpander.HandleCreateOn] Cannot find destination object {obj2.class_name} (id:{obj2.id}) in alignment");
                         expanderResult.AddItem(MISSING_DEST, obj2.class_name + "." + obj2.id.ToString());
                         // Debug.Log($"Cannot find {obj2.class_name} to put {obj.class_name} on it");
                     }
@@ -584,10 +598,12 @@ namespace StoryGenerator.Utilities
                     if (obj2.category != EnvironmentGraphCreator.RoomsCategory) {
                         EnvironmentObject sceneObj2;
                         if (alignment.TryGetValue(obj2.id, out sceneObj2)) {
+                            Debug.Log($"[GraphExpander.HandleCreateInside] Trying to place {obj.class_name} (id:{obj.id}) inside {obj2.class_name} (id:{obj2.id})");
                             if (TryPlaceObject(obj, sceneObj2, true)) {
                                 return true;
                             }
                         } else {
+                            Debug.LogWarning($"[GraphExpander.HandleCreateInside] Cannot find destination object {obj2.class_name} (id:{obj2.id}) in alignment");
                             expanderResult.AddItem(MISSING_DEST, obj2.class_name + "." + obj2.id.ToString());
                             // Debug.Log($"Cannot find {obj2.class_name} to put {obj.class_name} inside it");
                         }
@@ -604,7 +620,26 @@ namespace StoryGenerator.Utilities
             if (edgeMap.TryGetValue(Tuple.Create(obj.id, ObjectRelation.INSIDE), out objectsInRelation)) {
                 foreach (EnvironmentObject obj2 in objectsInRelation) {
                     if (obj2.category == EnvironmentGraphCreator.RoomsCategory) {
-                        Vector3 roomCenter = obj2.transform.GetComponent<Properties_room>().bounds.center;
+                        // Vector3 roomCenter = obj2.transform.GetComponent<Properties_room>().bounds.center;
+                        // 添加详细的空值检查
+                        if (obj2 == null) {
+                            Debug.LogError($"[HandleCreateInsideRoom] obj2 is null for obj.id={obj?.id}");
+                            continue;
+                        }
+                        
+                        if (obj2.transform == null) {
+                            Debug.LogError($"[HandleCreateInsideRoom] obj2.transform is null for obj2.id={obj2?.id}, obj2.category={obj2?.category}");
+                            continue;
+                        }
+                        
+                        Properties_room roomProps = obj2.transform.GetComponent<Properties_room>();
+                        if (roomProps == null) {
+                            Debug.LogError($"[HandleCreateInsideRoom] Properties_room component not found on obj2.id={obj2.id}, GameObject name={obj2.transform.name}");
+                            continue;
+                        }
+                        
+                        Vector3 roomCenter = roomProps.bounds.center;
+                        // end
 
                         foreach (EnvironmentObject roomObj in roomObjectsMap[obj2.id]) {
                             if (roomObj.transform == null)
@@ -1050,13 +1085,17 @@ namespace StoryGenerator.Utilities
         private bool PlaceObject(bool inside, string className, string prefabFile, EnvironmentObject destObj, Vector3 centerDelta, out GameObject newGo)
         {
             GameObject loadedObj = Resources.Load(ScriptUtils.TransformResourceFileName(prefabFile)) as GameObject;
+            string transformedPath = ScriptUtils.TransformResourceFileName(prefabFile);
             if (loadedObj == null)
             {
+                Debug.LogError($"[GraphExpander.PlaceObject] Resources.Load FAILED for '{transformedPath}' (original: '{prefabFile}')");
                 newGo = null;
                 return false;
             }
+            Debug.Log($"[GraphExpander.PlaceObject] Resources.Load SUCCESS for '{transformedPath}', GameObject name='{loadedObj.name}'");
             if (GameObjectUtils.GetCollider(loadedObj) == null) {
                 // If there are no colliders on destination object
+                Debug.LogWarning($"[GraphExpander.PlaceObject] No collider found on prefab '{loadedObj.name}' (path: '{transformedPath}'), cannot place object");
                 newGo = null;
                 return false;
             }

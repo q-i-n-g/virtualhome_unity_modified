@@ -33,7 +33,8 @@ namespace StoryGenerator.Utilities
         WALKTOWARDS,
         WALKFORWARD,
         TURNLEFT,
-        TURNRIGHT
+        TURNRIGHT,
+        THUMBSUP
     }
 
     public static class InteractionTypeGroup

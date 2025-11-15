@@ -685,6 +685,10 @@ namespace StoryGenerator
         {
             yield return SimpleAction("TalkRight");
         }
+        public IEnumerator ThumbsUp()
+        {
+            yield return SimpleAction("ThumbsUp");
+        }
         #endregion
 
         #region Public DoorActions
